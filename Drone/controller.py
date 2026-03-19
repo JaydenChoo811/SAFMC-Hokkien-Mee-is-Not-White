@@ -150,12 +150,22 @@ def arm_and_takeoff(mav, altitude=TAKEOFF_ALTITUDE):
 
     # Takeoff
     print("[INFO] Taking off...")
-    set_velocity(0, 0, -1.5)
+
+    DECEL_ZONE = 1  # meters before target to start slowing down
 
     start = time.time()
     while True:
         msg = mav.recv_match(type='GLOBAL_POSITION_INT', blocking=False)
         alt = (msg.relative_alt / 1000.0) if msg else 0
+
+        remaining = altitude - alt
+
+        if remaining <= DECEL_ZONE:
+            # Scale speed down as we approach target (min 0.3 m/s to keep moving)
+            speed = max(0.3, 1.5 * (remaining / DECEL_ZONE))
+            set_velocity(0, 0, -speed)
+        else:
+            set_velocity(0, 0, -1.5)
 
         if alt >= altitude * 0.95:
             break
@@ -166,9 +176,13 @@ def arm_and_takeoff(mav, altitude=TAKEOFF_ALTITUDE):
 
         time.sleep(0.2)
 
-    set_velocity(0, 0, 0)
-    print("[INFO] Hovering")
+    # Keep sending stop command until velocity bleeds off
+    stop_start = time.time()
+    while time.time() - stop_start < 2.0:
+        set_velocity(0, 0, 0)
+        time.sleep(0.1)
 
+    print("[INFO] Hovering")
     return True
 
 # Movement & Yaw
