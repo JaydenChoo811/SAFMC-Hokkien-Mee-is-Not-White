@@ -53,7 +53,7 @@ Supposed to parse output from stt into commands.
 To test, download ```soundclassifier_with_metadata.tflite``` and ```streamaudio20032026.py```, and store them in the same folder.
 Run ```streamaudio20032026.py```.
 
-This model is trained on my (Hao En's) voice, and in a quiet area. This may result in poor accuracy. Additional training from the pilot is required.
+This model is trained on my (Hao En's) voice, and in a quiet area. This may result in poor accuracy when used by someone else. Additional training from the pilot is required.
 
 Spoken Commands:
 1. Forwards, Reverse, Up, Down, Left, Right   :       Movement of drone
